@@ -1,7 +1,7 @@
 // Guarda la app en el teléfono para que funcione sin internet.
 // Cambia el número de versión cada vez que actualices index.html.
-const CACHE = "dulce-equilibrio-v3";
-const ARCHIVOS = ["./", "index.html", "ilustraciones.js", "manifest.json", "icon.svg", "icon-192.png", "icon-512.png"];
+const CACHE = "dulce-equilibrio-v4";
+const ARCHIVOS = ["./", "index.html", "ilustraciones.js", "privacidad.html", "manifest.json", "icon.svg", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ARCHIVOS)));

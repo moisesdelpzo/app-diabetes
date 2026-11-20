@@ -88,7 +88,8 @@
   .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
   .sheet { background: var(--card); width: 100%; max-width: 720px; max-height: 88vh; overflow: auto; border-radius: 18px 18px 0 0; padding: 20px 16px 28px; }
   @media (min-width: 760px) { .overlay { align-items: center; } .sheet { border-radius: 18px; } }
-  .sheet .close { float: right; }
+  .sheet .close { float: right; margin: 0 0 8px 8px; }
+  .sheet .alert { clear: both; }
   .typepick { display: grid; gap: 8px; margin: 12px 0; }
   .typepick button { text-align: left; }
   .hidden { display: none !important; }
@@ -115,7 +116,7 @@
 
 <main id="app"></main>
 
-<footer class="muted">Información educativa. No sustituye la consulta con tu médico.</footer>
+<footer class="muted">Información educativa. No sustituye la consulta con tu médico.<br><a href="privacidad.html" style="color:inherit">Política de privacidad</a></footer>
 
 <nav id="nav">
   <button data-v="inicio"><span class="ic">🏠</span>Inicio</button>
@@ -523,7 +524,10 @@ function setTipo(t) { tipo = t; store.set("tipo", t); cerrar(); render(); }
 
 /* ---------- Navegación ---------- */
 const VISTAS = { inicio: vInicio, recetas: vRecetas, ejercicio: vEjercicio, consejos: vConsejos, registro: vRegistro };
-function ir(v) { vista = v; render(); window.scrollTo(0, 0); }
+function ir(v) { vista = v; render(); window.scrollTo(0, 0); try { history.replaceState(null, "", v === "inicio" ? location.pathname : "#" + v); } catch {} }
+// Permite abrir una sección directamente con un enlace, por ejemplo .../app-diabetes/#recetas
+const desdeEnlace = location.hash.slice(1);
+if (VISTAS[desdeEnlace]) vista = desdeEnlace;
 function render() {
   $app.innerHTML = VISTAS[vista]();
   document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.v === vista));
