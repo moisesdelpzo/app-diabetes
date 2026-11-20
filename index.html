@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dulce Equilibrio</title>
+<meta name="description" content="Recetas, ejercicios, consejos y registro de glucosa para personas con diabetes tipo 1 y tipo 2.">
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  :root {
+    --bg: #f6f7f5; --card: #ffffff; --text: #1c2622; --muted: #5d6b65; --line: #e1e6e3;
+    --brand: #0f766e; --brand-soft: #d9f0ec; --warn: #b45309; --warn-soft: #fdf0dc;
+    --danger: #b91c1c; --danger-soft: #fde4e4; --ok: #15803d; --ok-soft: #dcf3e3;
+    --radius: 14px; --shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 14px rgba(0,0,0,.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101614; --card: #18211e; --text: #e6ece9; --muted: #9aa8a2; --line: #2a3531;
+      --brand: #2dd4bf; --brand-soft: #123a35; --warn: #f59e0b; --warn-soft: #3a2a10;
+      --danger: #f87171; --danger-soft: #3d1717; --ok: #4ade80; --ok-soft: #12321f;
+      --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+  header {
+    position: sticky; top: 0; z-index: 5; background: var(--brand); color: #fff;
+    padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+  }
+  @media (prefers-color-scheme: dark) { header { background: #0b3d38; } }
+  header h1 { font-size: 1.15rem; margin: 0; flex: 1; }
+  header button { background: rgba(255,255,255,.18); color: #fff; border: 0; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: .85rem; cursor: pointer; }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; }
+  h2 { font-size: 1.3rem; margin: 4px 0 12px; }
+  h3 { font-size: 1.05rem; margin: 0 0 6px; }
+  p { margin: 0 0 10px; }
+  .muted { color: var(--muted); font-size: .9rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .card.click { cursor: pointer; }
+  .card.click:hover { border-color: var(--brand); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .chip { display: inline-block; font-size: .78rem; padding: 2px 10px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); font-weight: 600; }
+  .chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 0 0 14px; }
+  .filter { border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: .9rem; cursor: pointer; }
+  .filter.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+  @media (prefers-color-scheme: dark) { .filter.on { color: #062b27; } }
+  .btn { background: var(--brand); color: #fff; border: 0; border-radius: 10px; padding: 10px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+  @media (prefers-color-scheme: dark) { .btn { color: #062b27; } }
+  .btn.ghost { background: transparent; color: var(--brand); border: 1px solid var(--brand); }
+  .btn.danger { background: var(--danger); color: #fff; }
+  .btn.small { padding: 6px 12px; font-size: .85rem; }
+  .alert { border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
+  .alert.danger { background: var(--danger-soft); border: 1px solid var(--danger); }
+  .alert.warn { background: var(--warn-soft); border: 1px solid var(--warn); }
+  .alert.info { background: var(--brand-soft); border: 1px solid var(--brand); }
+  .alert h3 { margin-bottom: 4px; }
+  ul, ol { margin: 6px 0 10px; padding-left: 22px; }
+  li { margin-bottom: 4px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .stat b { display: block; font-size: 1.5rem; }
+  .stat span { font-size: .8rem; color: var(--muted); }
+  label { display: block; font-size: .85rem; color: var(--muted); margin-bottom: 4px; }
+  input, select, textarea { width: 100%; font: inherit; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  .form { display: grid; gap: 10px; }
+  .entry { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .entry:last-child { border-bottom: 0; }
+  .val { font-weight: 700; font-size: 1.1rem; min-width: 64px; }
+  .val.low { color: var(--danger); } .val.high { color: var(--warn); } .val.okv { color: var(--ok); }
+  .del { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 1.1rem; }
+  canvas { width: 100%; height: 200px; display: block; }
+  nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 5; background: var(--card); border-top: 1px solid var(--line);
+    display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom);
+  }
+  nav button { background: none; border: 0; color: var(--muted); font: inherit; font-size: .72rem; padding: 8px 2px 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  nav button .ic { font-size: 1.3rem; line-height: 1; }
+  nav button.on { color: var(--brand); font-weight: 700; }
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 20; display: flex; align-items: flex-end; justify-content: center; }
+  .sheet { background: var(--card); width: 100%; max-width: 720px; max-height: 88vh; overflow: auto; border-radius: 18px 18px 0 0; padding: 20px 16px 28px; }
+  @media (min-width: 760px) { .overlay { align-items: center; } .sheet { border-radius: 18px; } }
+  .sheet .close { float: right; }
+  .typepick { display: grid; gap: 8px; margin: 12px 0; }
+  .typepick button { text-align: left; }
+  .hidden { display: none !important; }
+  .ilus { margin: -16px -16px 12px; border-radius: var(--radius) var(--radius) 0 0; overflow: hidden; line-height: 0; }
+  .ilus svg { width: 100%; height: auto; display: block; }
+  .portada { border-radius: var(--radius); overflow: hidden; line-height: 0; margin-bottom: 12px; }
+  .portada svg { width: 100%; height: auto; display: block; }
+  .sheet .ilus { margin: 0 0 12px; border-radius: 12px; }
+  .lista { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+  .lista .card { margin: 0; min-width: 0; }
+  @media (min-width: 560px) { .lista { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .tip { display: flex; gap: 12px; align-items: flex-start; }
+  .tip svg { flex: none; }
+  @media (prefers-color-scheme: dark) { .ilus svg, .portada svg { filter: brightness(.88); } }
+  footer { text-align: center; padding: 8px 16px 20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌿 Dulce Equilibrio</h1>
+  <button id="btnTipo" aria-label="Cambiar tipo de diabetes"></button>
+</header>
+
+<main id="app"></main>
+
+<footer class="muted">Información educativa. No sustituye la consulta con tu médico.</footer>
+
+<nav id="nav">
+  <button data-v="inicio"><span class="ic">🏠</span>Inicio</button>
+  <button data-v="recetas"><span class="ic">🥗</span>Recetas</button>
+  <button data-v="ejercicio"><span class="ic">🚶</span>Ejercicio</button>
+  <button data-v="consejos"><span class="ic">💡</span>Consejos</button>
+  <button data-v="registro"><span class="ic">📈</span>Registro</button>
+</nav>
+
+<div id="modal" class="overlay hidden"><div class="sheet" id="sheet"></div></div>
+
+<script src="ilustraciones.js"></script>
+<script>
+/* ============================================================
+   CONTENIDO  (edítalo aquí para añadir recetas, ejercicios o consejos)
+   ============================================================ */
+
+const RECETAS = [
+  { nombre: "Mangú de plátano verde con huevo y aguacate", momento: "Desayuno", carbs: 30, tiempo: "25 min",
+    ingredientes: ["½ plátano verde mediano", "2 huevos", "¼ aguacate", "½ cebolla roja en aros", "1 cdta de aceite de oliva", "Vinagre, sal y pimienta"],
+    pasos: ["Hierve el plátano en agua con sal hasta que esté blando (15–20 min).", "Májalo con un poco del agua de hervir y el aceite.", "Saltea la cebolla con un chorrito de vinagre.", "Acompaña con los huevos hervidos o a la plancha y el aguacate."],
+    nota: "Medio plátano en vez de uno entero baja mucho los carbohidratos. Evita el salami frito; usa huevo o queso blanco a la plancha." },
+  { nombre: "Avena de noche con canela y fresas", momento: "Desayuno", carbs: 35, tiempo: "5 min + reposo",
+    ingredientes: ["½ taza de avena en hojuelas (no instantánea)", "½ taza de leche descremada o bebida de almendra sin azúcar", "1 cda de semillas de chía", "Canela al gusto", "½ taza de fresas picadas"],
+    pasos: ["Mezcla la avena, la leche, la chía y la canela en un frasco.", "Refrigera toda la noche.", "Por la mañana añade las fresas por encima."],
+    nota: "La avena entera y la chía hacen que el azúcar suba más despacio. No le añadas azúcar ni miel." },
+  { nombre: "Revoltillo de vegetales con pan integral", momento: "Desayuno", carbs: 18, tiempo: "10 min",
+    ingredientes: ["2 huevos", "Espinaca, ají y tomate picados", "1 rebanada de pan 100 % integral", "1 cdta de aceite"],
+    pasos: ["Saltea los vegetales en el aceite 2–3 min.", "Añade los huevos batidos y revuelve hasta que cuajen.", "Sirve con la rebanada de pan tostada."],
+    nota: "Revisa la etiqueta del pan: que el primer ingrediente diga «harina integral»." },
+  { nombre: "Pollo guisado con moro de habichuelas y ensalada", momento: "Almuerzo", carbs: 35, tiempo: "45 min",
+    ingredientes: ["120 g de pechuga o muslo sin piel", "½ taza de moro de habichuelas", "Sazón natural: ajo, cebolla, ají, orégano, cilantro", "Lechuga, tomate, pepino", "1 cdta de aceite de oliva"],
+    pasos: ["Sazona el pollo y guísalo a fuego medio con poca agua y los vegetales.", "Sirve ½ taza de moro (mide con una taza la primera vez).", "Llena la mitad del plato con ensalada."],
+    nota: "Método del plato: ½ vegetales, ¼ proteína, ¼ carbohidrato. Usa sazón natural en vez de cubitos con mucho sodio." },
+  { nombre: "Pescado al horno con yuca y vegetales", momento: "Almuerzo", carbs: 28, tiempo: "35 min",
+    ingredientes: ["1 filete de pescado blanco (150 g)", "⅓ taza de yuca hervida", "Brócoli, zanahoria y tayota al vapor", "Limón, ajo, orégano"],
+    pasos: ["Adoba el pescado con limón, ajo y orégano.", "Hornéalo a 200 °C unos 15–20 min.", "Sirve con la yuca y abundantes vegetales al vapor."],
+    nota: "La yuca es rica en almidón: mantén la porción pequeña y llena el resto del plato con vegetales." },
+  { nombre: "Sopa de lentejas con vegetales", momento: "Almuerzo", carbs: 32, tiempo: "40 min",
+    ingredientes: ["¾ taza de lentejas cocidas", "Auyama, zanahoria, apio y cebolla", "Ajo y comino", "Caldo bajo en sal"],
+    pasos: ["Sofríe la cebolla y el ajo.", "Añade los vegetales en trozos, las lentejas y el caldo.", "Cocina 25 min a fuego medio."],
+    nota: "Las legumbres tienen mucha fibra y proteína: suben la glucosa más lento que el arroz blanco." },
+  { nombre: "Ensalada de garbanzos, pepino y tomate", momento: "Almuerzo", carbs: 25, tiempo: "10 min",
+    ingredientes: ["½ taza de garbanzos cocidos", "1 pepino", "1 tomate", "¼ cebolla roja", "Perejil, limón y 1 cdta de aceite de oliva"],
+    pasos: ["Pica todo en cubos.", "Mezcla con limón, aceite, sal y pimienta.", "Puedes añadir atún o queso blanco para más proteína."],
+    nota: "Ideal para llevar al trabajo." },
+  { nombre: "Tayota guisada con pollo desmenuzado", momento: "Cena", carbs: 10, tiempo: "30 min",
+    ingredientes: ["2 tayotas peladas en cubos", "100 g de pollo desmenuzado", "Cebolla, ajo, ají, tomate", "Cilantro"],
+    pasos: ["Sofríe los vegetales.", "Añade la tayota y un poco de agua; cocina 15 min.", "Agrega el pollo y el cilantro al final."],
+    nota: "Muy baja en carbohidratos, buena opción para la cena." },
+  { nombre: "Tortilla de espinaca y queso blanco", momento: "Cena", carbs: 5, tiempo: "15 min",
+    ingredientes: ["2 huevos + 1 clara", "1 taza de espinaca", "30 g de queso blanco", "Cebolla"],
+    pasos: ["Saltea la cebolla y la espinaca.", "Vierte los huevos batidos y cocina tapado a fuego bajo.", "Añade el queso y dobla."],
+    nota: "Acompáñala con una ensalada grande." },
+  { nombre: "Berenjena guisada con habichuelas rojas", momento: "Cena", carbs: 22, tiempo: "30 min",
+    ingredientes: ["1 berenjena en cubos", "⅓ taza de habichuelas rojas cocidas", "Tomate, cebolla, ajo, ají", "Orégano"],
+    pasos: ["Sofríe el ajo, la cebolla y el ají.", "Añade la berenjena y el tomate; cocina 15 min.", "Agrega las habichuelas y cocina 5 min más."],
+    nota: "Plato vegetariano con fibra y proteína." },
+  { nombre: "Yogur griego con nueces y canela", momento: "Merienda", carbs: 8, tiempo: "2 min",
+    ingredientes: ["¾ taza de yogur griego natural sin azúcar", "1 cda de nueces o almendras", "Canela"],
+    pasos: ["Sirve el yogur y añade las nueces y la canela."],
+    nota: "Evita los yogures «de frutas»: suelen tener mucha azúcar añadida." },
+  { nombre: "Vegetales crudos con hummus", momento: "Merienda", carbs: 12, tiempo: "5 min",
+    ingredientes: ["Palitos de pepino, zanahoria y ají", "3 cdas de hummus"],
+    pasos: ["Corta los vegetales en tiras y sírvelos con el hummus."],
+    nota: "Merienda crujiente y saciante." },
+  { nombre: "Manzana con mantequilla de maní", momento: "Merienda", carbs: 20, tiempo: "2 min",
+    ingredientes: ["1 manzana pequeña", "1 cda de mantequilla de maní natural (sin azúcar)"],
+    pasos: ["Corta la manzana en gajos y úntalos con la mantequilla de maní."],
+    nota: "La grasa y la proteína del maní hacen que la fruta suba la glucosa más despacio." },
+];
+
+const EJERCICIOS = [
+  { nombre: "Caminata a paso ligero", nivel: "Principiante", dur: "30 min", frec: "5 días por semana",
+    como: ["Camina a un ritmo en el que puedas hablar pero no cantar.", "Si 30 min es mucho, empieza con 3 bloques de 10 min.", "Usa zapatos cómodos y medias sin costuras."] },
+  { nombre: "Paseo después de comer", nivel: "Todos", dur: "10–15 min", frec: "Después de cada comida",
+    como: ["Sal a caminar suave justo después de almorzar o cenar.", "Ayuda a que los músculos usen la glucosa de la comida.", "Es de lo más fácil y efectivo que puedes hacer."] },
+  { nombre: "Sentadillas con silla", nivel: "Principiante", dur: "3 series de 10", frec: "2–3 días por semana",
+    como: ["Párate frente a una silla con los pies al ancho de los hombros.", "Baja lentamente hasta tocar la silla con los glúteos y vuelve a subir.", "Mantén la espalda recta y las rodillas detrás de la punta de los pies."] },
+  { nombre: "Flexiones contra la pared", nivel: "Principiante", dur: "3 series de 10", frec: "2–3 días por semana",
+    como: ["Apoya las manos en la pared a la altura del pecho.", "Dobla los codos acercando el pecho a la pared y empuja de vuelta.", "Cuanto más lejos pongas los pies, más difícil."] },
+  { nombre: "Elevación de talones", nivel: "Principiante", dur: "3 series de 15", frec: "2–3 días por semana",
+    como: ["De pie, apoyado en una silla, sube en puntas de pie.", "Baja despacio.", "Fortalece pantorrillas y mejora la circulación en las piernas."] },
+  { nombre: "Remo con banda elástica", nivel: "Intermedio", dur: "3 series de 12", frec: "2–3 días por semana",
+    como: ["Sujeta la banda con los pies o a un poste.", "Tira hacia tu cuerpo juntando los omóplatos.", "Regresa despacio, sin soltar de golpe."] },
+  { nombre: "Baile o bicicleta estática", nivel: "Intermedio", dur: "20–30 min", frec: "3 días por semana",
+    como: ["Pon tu música favorita: merengue, bachata, lo que te mueva.", "Cualquier actividad que acelere la respiración cuenta.", "Empieza suave los primeros 5 minutos."] },
+  { nombre: "Estiramientos suaves", nivel: "Todos", dur: "10 min", frec: "Todos los días",
+    como: ["Estira cuello, hombros, espalda, piernas y tobillos.", "Mantén cada estiramiento 20–30 segundos sin rebotar.", "Ideal al terminar la caminata o antes de dormir."] },
+];
+
+// Ilustración de cada receta y ejercicio (en el mismo orden de las listas; ver ilustraciones.js)
+["mangu", "avena", "revoltillo", "pollo", "pescado", "lentejas", "garbanzos", "tayota", "tortilla", "berenjena", "yogur", "hummus", "manzana"]
+  .forEach((k, i) => { if (RECETAS[i] && !RECETAS[i].img) RECETAS[i].img = k; });
+["caminar", "paseo", "sentadilla", "pared", "talones", "remo", "baile", "estirar"]
+  .forEach((k, i) => { if (EJERCICIOS[i] && !EJERCICIOS[i].img) EJERCICIOS[i].img = k; });
+
+// tipo: "todos", "t1" o "t2"
+const CONSEJOS = [
+  { cat: "Alimentación", tipo: "todos", t: "Usa el método del plato", d: "Llena la mitad del plato con vegetales sin almidón, un cuarto con proteína y un cuarto con carbohidratos (arroz, víveres, pan). No hace falta pesar todo." },
+  { cat: "Alimentación", tipo: "todos", t: "Cuidado con las bebidas", d: "Refrescos, jugos (incluso naturales) y malta suben la glucosa muy rápido. Prefiere agua, agua con limón, café o té sin azúcar." },
+  { cat: "Alimentación", tipo: "todos", t: "Aprende a leer etiquetas", d: "Mira el tamaño de la porción y los «carbohidratos totales». Desconfía de lo que dice «sin azúcar» en grande: puede tener harinas o almidones." },
+  { cat: "Alimentación", tipo: "todos", t: "Prefiere lo integral y las legumbres", d: "Habichuelas, lentejas, garbanzos, avena y pan integral tienen fibra que hace que el azúcar suba más despacio." },
+  { cat: "Alimentación", tipo: "todos", t: "No te saltes comidas", d: "Comer a horas parecidas ayuda a mantener la glucosa estable y evita bajones y atracones." },
+  { cat: "Alimentación", tipo: "t1", t: "Conteo de carbohidratos", d: "Si usas insulina rápida con las comidas, aprender a contar carbohidratos es clave. Pide a tu equipo médico tu proporción insulina–carbohidratos; nunca la ajustes por tu cuenta." },
+  { cat: "Alimentación", tipo: "t2", t: "Bajar un poco de peso ayuda mucho", d: "Perder entre el 5 % y el 10 % del peso puede mejorar notablemente la glucosa en la diabetes tipo 2. Pequeños cambios sostenidos funcionan mejor que dietas estrictas." },
+  { cat: "Glucosa", tipo: "todos", t: "Metas generales de glucosa", d: "Como referencia general para adultos: 80–130 mg/dL en ayunas y menos de 180 mg/dL dos horas después de comer. Tu médico puede indicarte metas distintas." },
+  { cat: "Glucosa", tipo: "todos", t: "Señales de azúcar baja (hipoglucemia)", d: "Temblor, sudor, hambre repentina, mareo, confusión, irritabilidad, palpitaciones. Si la tienes, mide y aplica la regla 15-15 (botón rojo en Inicio)." },
+  { cat: "Glucosa", tipo: "todos", t: "Señales de azúcar alta", d: "Mucha sed, orinar a menudo, cansancio, visión borrosa. Si se repite, coméntalo con tu médico." },
+  { cat: "Glucosa", tipo: "t1", t: "Cetonas: cuándo revisarlas", d: "Si tu glucosa está por encima de 250 mg/dL de forma sostenida, o tienes náuseas, vómito o dolor de barriga, revisa cetonas y sigue el plan de tu médico. Cetonas altas con vómito es una urgencia." },
+  { cat: "Glucosa", tipo: "t1", t: "Días de enfermedad", d: "Al estar enfermo la glucosa suele subir aunque comas poco. No dejes la insulina basal sin consultar; mide más seguido y mantente hidratado." },
+  { cat: "Medicación", tipo: "todos", t: "Toma tu medicación como te la indicaron", d: "No la suspendas ni cambies la dosis por tu cuenta, aunque te sientas bien. Si te cae mal, habla con tu médico: suele haber alternativas." },
+  { cat: "Medicación", tipo: "t2", t: "Algunas pastillas pueden bajar mucho el azúcar", d: "Si usas insulina o medicamentos como glibenclamida o glimepirida, puedes tener hipoglucemias. Lleva siempre algo dulce contigo." },
+  { cat: "Cuidado del cuerpo", tipo: "todos", t: "Revisa tus pies todos los días", d: "Busca cortes, ampollas, enrojecimiento o uñas encarnadas. Sécalos bien entre los dedos y no camines descalzo. Cualquier herida que no sana, al médico." },
+  { cat: "Cuidado del cuerpo", tipo: "todos", t: "Chequeos anuales", d: "Ojos (fondo de ojo), riñones (orina y sangre), pies, presión arterial y colesterol. La hemoglobina glicosilada (HbA1c) normalmente cada 3 a 6 meses." },
+  { cat: "Cuidado del cuerpo", tipo: "todos", t: "Dientes y encías", d: "La diabetes aumenta el riesgo de problemas en las encías. Cepíllate dos veces al día y visita al dentista." },
+  { cat: "Bienestar", tipo: "todos", t: "Duerme bien", d: "Dormir poco sube el azúcar y el apetito. Intenta dormir 7–8 horas con horarios regulares." },
+  { cat: "Bienestar", tipo: "todos", t: "El estrés también sube la glucosa", d: "Caminar, respirar profundo, rezar, hablar con alguien de confianza… lo que te funcione. Si te sientes agotado de la diabetes, pide ayuda: es muy común." },
+  { cat: "Bienestar", tipo: "todos", t: "Alcohol con precaución", d: "El alcohol puede provocar hipoglucemia horas después, sobre todo si usas insulina. Nunca bebas con el estómago vacío y avisa a quien te acompañe de que tienes diabetes." },
+];
+
+/* ============================================================
+   ESTADO Y ALMACENAMIENTO (todo se guarda solo en este teléfono)
+   ============================================================ */
+const store = {
+  get(k, def) { try { const v = localStorage.getItem("de_" + k); return v ? JSON.parse(v) : def; } catch { return def; } },
+  set(k, v) { try { localStorage.setItem("de_" + k, JSON.stringify(v)); } catch {} }
+};
+const TIPOS = { t1: "Tipo 1", t2: "Tipo 2", nose: "General" };
+let tipo = store.get("tipo", null);
+let vista = "inicio";
+let filtroReceta = "Todas";
+let filtroConsejo = "Todas";
+
+const $app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* ============================================================
+   VISTAS
+   ============================================================ */
+function vInicio() {
+  const regs = store.get("registros", []);
+  const ult = regs[regs.length - 1];
+  const consejoDia = consejosFiltrados()[new Date().getDate() % consejosFiltrados().length];
+  return `
+    <div class="portada">${ILUS.portada()}</div>
+    <h2>¡Hola! 👋</h2>
+    <button class="btn danger" style="width:100%;margin-bottom:12px" onclick="abrirHipo()">🆘 ¿Te sientes con el azúcar bajo?</button>
+    <div class="card">
+      <h3>Tu última medición</h3>
+      ${ult ? `<p><span class="val ${clase(ult.v)}">${ult.v} mg/dL</span> <span class="muted">· ${esc(ult.m)} · ${fecha(ult.t)}</span></p>`
+            : `<p class="muted">Aún no has registrado ninguna.</p>`}
+      <button class="btn small" onclick="ir('registro')">Anotar glucosa</button>
+    </div>
+    <div class="card">
+      <span class="chip">Consejo del día</span>
+      <h3 style="margin-top:8px">${esc(consejoDia.t)}</h3>
+      <p>${esc(consejoDia.d)}</p>
+    </div>
+    <div class="grid2">
+      <div class="card click" onclick="ir('recetas')"><h3>🥗 Recetas</h3><p class="muted">${RECETAS.length} ideas con carbohidratos por porción</p></div>
+      <div class="card click" onclick="ir('ejercicio')"><h3>🚶 Ejercicio</h3><p class="muted">Rutinas sencillas para empezar</p></div>
+    </div>
+    <div class="alert info">
+      <p style="margin:0"><b>Importante:</b> esta app es educativa. No calcula dosis ni reemplaza a tu médico. Ante cualquier duda o síntoma grave, consulta a un profesional.</p>
+    </div>`;
+}
+
+function vRecetas() {
+  const momentos = ["Todas", "Desayuno", "Almuerzo", "Cena", "Merienda"];
+  const lista = RECETAS.map((r, i) => ({ ...r, i })).filter(r => filtroReceta === "Todas" || r.momento === filtroReceta);
+  return `
+    <h2>Recetas</h2>
+    <div class="chips">${momentos.map(m => `<button class="filter ${m === filtroReceta ? "on" : ""}" onclick="filtroReceta='${m}';render()">${m}</button>`).join("")}</div>
+    <div class="lista">${lista.map(r => `
+      <div class="card click" onclick="abrirReceta(${r.i})">
+        <div class="ilus">${ILUS.receta(r)}</div>
+        <div class="row"><span class="chip">${r.momento}</span><span class="chip warn">≈ ${r.carbs} g carbohidratos</span></div>
+        <h3 style="margin-top:8px">${esc(r.nombre)}</h3>
+        <p class="muted" style="margin:0">⏱ ${r.tiempo}</p>
+      </div>`).join("")}</div>
+    <p></p>
+    <p class="muted">Los carbohidratos son aproximados por porción y pueden variar según el tamaño de los ingredientes.</p>`;
+}
+
+function vEjercicio() {
+  const seg = {
+    t1: `<div class="alert warn"><h3>Antes de ejercitarte (tipo 1)</h3><ul>
+          <li>Mide tu glucosa antes, durante (si dura más de 30 min) y después.</li>
+          <li>Si está por debajo de 90 mg/dL, come unos 15 g de carbohidratos antes de empezar.</li>
+          <li>Si está por encima de 250 mg/dL, revisa cetonas: si son positivas, <b>no hagas ejercicio</b>.</li>
+          <li>El azúcar puede bajar hasta 24 horas después: vigila de noche.</li>
+          <li>Lleva siempre tabletas de glucosa o un jugo pequeño.</li></ul></div>`,
+    t2: `<div class="alert warn"><h3>Antes de ejercitarte (tipo 2)</h3><ul>
+          <li>Si usas insulina o pastillas como glibenclamida, mide antes y lleva algo dulce.</li>
+          <li>Usa zapatos cómodos y revisa tus pies al terminar.</li>
+          <li>Si tienes problemas del corazón, de la vista o de los pies, consulta antes de empezar.</li></ul></div>`,
+  };
+  const aviso = tipo === "t1" ? seg.t1 : tipo === "t2" ? seg.t2 : seg.t1 + seg.t2;
+  return `
+    <h2>Ejercicio</h2>
+    <div class="alert info"><p style="margin:0">🎯 <b>Meta general:</b> 150 minutos a la semana de actividad moderada (unos 30 min, 5 días), sin pasar más de 2 días seguidos sin moverte, y ejercicios de fuerza 2–3 veces por semana.</p></div>
+    ${aviso}
+    <div class="lista">${EJERCICIOS.map(e => `
+      <div class="card">
+        <div class="ilus">${ILUS.ejercicio(e)}</div>
+        <div class="row"><span class="chip">${e.nivel}</span><span class="chip warn">${e.dur}</span></div>
+        <h3 style="margin-top:8px">${esc(e.nombre)}</h3>
+        <p class="muted" style="margin-bottom:4px">${e.frec}</p>
+        <ul>${e.como.map(c => `<li>${esc(c)}</li>`).join("")}</ul>
+      </div>`).join("")}</div>
+    <p></p>
+    <p class="muted">Detente si sientes dolor en el pecho, falta de aire fuera de lo normal, mareo o síntomas de azúcar baja.</p>`;
+}
+
+function consejosFiltrados() {
+  return CONSEJOS.filter(c => c.tipo === "todos" || tipo === "nose" || !tipo || c.tipo === tipo);
+}
+function vConsejos() {
+  const cats = ["Todas", ...new Set(CONSEJOS.map(c => c.cat))];
+  const lista = consejosFiltrados().filter(c => filtroConsejo === "Todas" || c.cat === filtroConsejo);
+  return `
+    <h2>Consejos</h2>
+    <p class="muted">Mostrando consejos para: <b>${TIPOS[tipo] || "General"}</b></p>
+    <div class="chips">${cats.map(c => `<button class="filter ${c === filtroConsejo ? "on" : ""}" onclick="filtroConsejo='${c}';render()">${c}</button>`).join("")}</div>
+    ${lista.map(c => `
+      <div class="card tip">
+        ${ILUS.icono(c.cat)}
+        <div>
+          <div class="row"><span class="chip">${c.cat}</span>${c.tipo !== "todos" ? `<span class="chip warn">${TIPOS[c.tipo]}</span>` : ""}</div>
+          <h3 style="margin-top:8px">${esc(c.t)}</h3>
+          <p style="margin:0">${esc(c.d)}</p>
+        </div>
+      </div>`).join("")}
+    <p class="muted">Fuentes de referencia: Asociación Americana de la Diabetes (ADA) y Organización Mundial de la Salud (OMS).</p>`;
+}
+
+function vRegistro() {
+  const regs = store.get("registros", []);
+  const semana = regs.filter(r => Date.now() - r.t < 7 * 864e5);
+  const prom = semana.length ? Math.round(semana.reduce((a, r) => a + r.v, 0) / semana.length) : "–";
+  const bajas = semana.filter(r => r.v < 70).length;
+  const altas = semana.filter(r => r.v > 180).length;
+  const ahora = new Date(); ahora.setMinutes(ahora.getMinutes() - ahora.getTimezoneOffset());
+  return `
+    <h2>Registro de glucosa</h2>
+    <div class="card">
+      <form class="form" onsubmit="guardar(event)">
+        <div class="grid2">
+          <div><label for="fv">Glucosa (mg/dL)</label><input id="fv" type="number" inputmode="numeric" min="20" max="600" required placeholder="Ej. 110"></div>
+          <div><label for="fm">Momento</label>
+            <select id="fm"><option>En ayunas</option><option>Antes de comer</option><option>2 h después de comer</option><option>Antes de dormir</option><option>Antes de ejercicio</option><option>Otro</option></select></div>
+        </div>
+        <div><label for="ft">Fecha y hora</label><input id="ft" type="datetime-local" value="${ahora.toISOString().slice(0, 16)}"></div>
+        <div><label for="fn">Nota (opcional)</label><input id="fn" maxlength="120" placeholder="Ej. comí arroz, caminé 20 min"></div>
+        <button class="btn" type="submit">Guardar</button>
+      </form>
+    </div>
+    <div class="row" style="display:grid;grid-template-columns:repeat(3,1fr);margin-bottom:12px">
+      <div class="stat"><b>${prom}</b><span>Promedio 7 días</span></div>
+      <div class="stat"><b style="color:var(--danger)">${bajas}</b><span>Bajas (&lt;70)</span></div>
+      <div class="stat"><b style="color:var(--warn)">${altas}</b><span>Altas (&gt;180)</span></div>
+    </div>
+    <div class="card">
+      <h3>Últimas mediciones</h3>
+      <p class="muted">La franja verde es el rango 70–180 mg/dL.</p>
+      ${regs.length ? `<canvas id="grafica"></canvas>` : `<p class="muted">Cuando anotes mediciones verás aquí tu gráfica.</p>`}
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between"><h3>Historial</h3>
+        ${regs.length ? `<button class="btn ghost small" onclick="exportar()">Descargar (CSV)</button>` : ""}</div>
+      ${regs.length ? regs.slice().reverse().slice(0, 50).map(r => `
+        <div class="entry">
+          <span class="val ${clase(r.v)}">${r.v}</span>
+          <div style="flex:1"><div>${esc(r.m)}</div><div class="muted">${fecha(r.t)}${r.n ? " · " + esc(r.n) : ""}</div></div>
+          <button class="del" title="Borrar" aria-label="Borrar medición" onclick="borrar(${r.t})">✕</button>
+        </div>`).join("") : `<p class="muted">Sin registros todavía.</p>`}
+    </div>
+    <p class="muted">🔒 Tus datos se guardan solo en este dispositivo. Descarga el CSV para llevárselo a tu médico.</p>`;
+}
+
+/* ============================================================
+   ACCIONES
+   ============================================================ */
+function clase(v) { return v < 70 ? "low" : v > 180 ? "high" : "okv"; }
+function fecha(t) { return new Date(t).toLocaleString("es", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); }
+
+function guardar(e) {
+  e.preventDefault();
+  const v = parseInt(document.getElementById("fv").value, 10);
+  if (!v || v < 20 || v > 600) return;
+  const tf = document.getElementById("ft").value;
+  const t = tf ? new Date(tf).getTime() : Date.now();
+  const regs = store.get("registros", []);
+  regs.push({ v, m: document.getElementById("fm").value, n: document.getElementById("fn").value.trim(), t });
+  regs.sort((a, b) => a.t - b.t);
+  store.set("registros", regs);
+  render();
+  if (v < 70) abrirHipo();
+  else if (v > 250 && tipo !== "t2") alertaAlta();
+}
+function borrar(t) {
+  if (!confirm("¿Borrar esta medición?")) return;
+  store.set("registros", store.get("registros", []).filter(r => r.t !== t));
+  render();
+}
+function exportar() {
+  const regs = store.get("registros", []);
+  const filas = [["Fecha", "Glucosa (mg/dL)", "Momento", "Nota"], ...regs.map(r => [new Date(r.t).toLocaleString("es"), r.v, r.m, r.n || ""])];
+  const csv = "﻿" + filas.map(f => f.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  a.download = "registro-glucosa.csv";
+  a.click();
+}
+
+function dibujar() {
+  const c = document.getElementById("grafica");
+  if (!c) return;
+  const regs = store.get("registros", []).slice(-14);
+  const dpr = window.devicePixelRatio || 1;
+  const W = c.clientWidth, H = c.clientHeight;
+  c.width = W * dpr; c.height = H * dpr;
+  const g = c.getContext("2d"); g.scale(dpr, dpr);
+  const css = getComputedStyle(document.documentElement);
+  const col = n => css.getPropertyValue(n).trim();
+  const pad = { l: 34, r: 10, t: 10, b: 10 };
+  const max = Math.max(250, ...regs.map(r => r.v)) + 20, min = Math.min(50, ...regs.map(r => r.v)) - 10;
+  const y = v => pad.t + (H - pad.t - pad.b) * (1 - (v - min) / (max - min));
+  const x = i => regs.length === 1 ? W / 2 : pad.l + (W - pad.l - pad.r) * i / (regs.length - 1);
+  g.fillStyle = col("--ok-soft"); g.fillRect(pad.l, y(180), W - pad.l - pad.r, y(70) - y(180));
+  g.fillStyle = col("--muted"); g.font = "11px system-ui";
+  [70, 180].forEach(v => g.fillText(v, 4, y(v) + 4));
+  g.strokeStyle = col("--brand"); g.lineWidth = 2; g.beginPath();
+  regs.forEach((r, i) => i ? g.lineTo(x(i), y(r.v)) : g.moveTo(x(i), y(r.v))); g.stroke();
+  regs.forEach((r, i) => {
+    g.fillStyle = col(r.v < 70 ? "--danger" : r.v > 180 ? "--warn" : "--ok");
+    g.beginPath(); g.arc(x(i), y(r.v), 4.5, 0, 7); g.fill();
+  });
+}
+
+/* ---------- Ventanas emergentes ---------- */
+const $modal = document.getElementById("modal"), $sheet = document.getElementById("sheet");
+function abrir(html, cerrable = true) {
+  $sheet.innerHTML = (cerrable ? `<button class="btn ghost small close" onclick="cerrar()">Cerrar</button>` : "") + html;
+  $modal.classList.remove("hidden");
+  $modal.onclick = cerrable ? e => { if (e.target === $modal) cerrar(); } : null;
+}
+function cerrar() { $modal.classList.add("hidden"); }
+
+function abrirReceta(i) {
+  const r = RECETAS[i];
+  abrir(`
+    <div class="ilus" style="clear:both;margin-top:44px">${ILUS.receta(r)}</div>
+    <div class="row"><span class="chip">${r.momento}</span><span class="chip warn">≈ ${r.carbs} g carbohidratos</span></div>
+    <h2 style="margin-top:10px">${esc(r.nombre)}</h2>
+    <p class="muted">⏱ ${r.tiempo} · 1 porción</p>
+    <h3>Ingredientes</h3><ul>${r.ingredientes.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    <h3>Preparación</h3><ol>${r.pasos.map(x => `<li>${esc(x)}</li>`).join("")}</ol>
+    <div class="alert info"><p style="margin:0">💡 ${esc(r.nota)}</p></div>`);
+}
+
+function abrirHipo() {
+  abrir(`
+    <div class="alert danger">
+      <h3>🆘 Azúcar baja: regla 15-15</h3>
+      <p>Si tu glucosa está por debajo de 70 mg/dL o tienes síntomas:</p>
+      <ol>
+        <li><b>Toma 15 g de azúcar rápida:</b> ½ vaso (120 ml) de jugo o refresco normal (no light), 1 cucharada de azúcar o miel, o 4 tabletas de glucosa.</li>
+        <li><b>Espera 15 minutos</b> y vuelve a medir.</li>
+        <li>Si sigue por debajo de 70, <b>repite</b>.</li>
+        <li>Cuando se normalice, come algo con carbohidratos y proteína si falta más de una hora para tu próxima comida.</li>
+      </ol>
+      <p><b>Llama a emergencias</b> si la persona está confundida, no puede tragar, se desmaya o convulsiona. No le des nada por la boca; si tiene glucagón y alguien sabe usarlo, que lo aplique.</p>
+    </div>
+    <p class="muted">Evita chocolate o galletas para corregir: la grasa hace que el azúcar suba más lento.</p>`);
+}
+function alertaAlta() {
+  abrir(`
+    <div class="alert warn">
+      <h3>Glucosa alta</h3>
+      <p>Si tienes diabetes tipo 1 o usas insulina y tu glucosa está por encima de 250 mg/dL:</p>
+      <ul>
+        <li>Revisa cetonas si tienes tiras o medidor.</li>
+        <li>Bebe agua y sigue el plan de corrección que te dio tu médico.</li>
+        <li>Busca atención urgente si tienes vómito, dolor de barriga, respiración rápida o mucho sueño.</li>
+      </ul>
+    </div>`);
+}
+
+function elegirTipo(primeraVez) {
+  abrir(`
+    ${primeraVez ? `<div class="portada">${ILUS.portada()}</div>` : ""}
+    <h2>${primeraVez ? "Bienvenido a Dulce Equilibrio 🌿" : "¿Qué tipo de diabetes tienes?"}</h2>
+    ${primeraVez ? `<p>Recetas, ejercicios, consejos y un registro de glucosa, en un solo lugar.</p>
+      <div class="alert warn"><p style="margin:0"><b>Aviso:</b> esta app ofrece información educativa general. No da diagnósticos ni calcula dosis de medicamentos, y no reemplaza la atención de tu médico.</p></div>
+      <p><b>¿Qué tipo de diabetes tienes?</b> Así te mostramos los consejos que te tocan.</p>` : ""}
+    <div class="typepick">
+      <button class="btn ${tipo === "t1" ? "" : "ghost"}" onclick="setTipo('t1')">Tipo 1 <span class="muted">· uso insulina desde el diagnóstico</span></button>
+      <button class="btn ${tipo === "t2" ? "" : "ghost"}" onclick="setTipo('t2')">Tipo 2 <span class="muted">· pastillas, insulina o solo dieta</span></button>
+      <button class="btn ${tipo === "nose" ? "" : "ghost"}" onclick="setTipo('nose')">No estoy seguro / cuido a alguien</button>
+    </div>`, !primeraVez);
+}
+function setTipo(t) { tipo = t; store.set("tipo", t); cerrar(); render(); }
+
+/* ---------- Navegación ---------- */
+const VISTAS = { inicio: vInicio, recetas: vRecetas, ejercicio: vEjercicio, consejos: vConsejos, registro: vRegistro };
+function ir(v) { vista = v; render(); window.scrollTo(0, 0); }
+function render() {
+  $app.innerHTML = VISTAS[vista]();
+  document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.v === vista));
+  document.getElementById("btnTipo").textContent = TIPOS[tipo] || "Elegir tipo";
+  dibujar();
+}
+document.querySelectorAll("#nav button").forEach(b => b.onclick = () => ir(b.dataset.v));
+document.getElementById("btnTipo").onclick = () => elegirTipo(false);
+window.addEventListener("resize", dibujar);
+
+render();
+if (!tipo) elegirTipo(true);
+
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>
